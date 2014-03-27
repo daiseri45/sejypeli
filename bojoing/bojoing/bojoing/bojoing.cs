@@ -14,8 +14,8 @@ public class bojoing : PhysicsGame
 
     PlatformCharacter pelaaja1;
 
-    Image pelaajanKuva1 = LoadImage("ihminen 2 (peliin)");
-    Image pelaajanKuva2 = LoadImage("ihminen (peliin)");
+    Image pelaajanKuva1 = LoadImage("ihminen (peliin)");
+    Image pelaajanKuva2 = LoadImage("ihminen 2 (peliin)");
     Image tahtiKuva = LoadImage("tahti");
 
     SoundEffect maaliAani = LoadSoundEffect("maali");
@@ -42,10 +42,12 @@ public class bojoing : PhysicsGame
 
     void LuoKentta()
     {
-        TileMap kentta = TileMap.FromLevelAsset("kentta1");
-        kentta.SetTileMethod('#', LisaaTaso);
-        kentta.SetTileMethod('*', LisaaTahti);
-        kentta.SetTileMethod('N', LisaaPelaaja);
+        ColorTileMap kentta = ColorTileMap.FromLevelAsset("kentta");
+        kentta.SetTileMethod(Color.Black, LisaaTaso);
+        kentta.SetTileMethod(Color.FromPaintDotNet(0, 4), LisaaTahti);
+        kentta.SetTileMethod(Color.FromPaintDotNet(0, 2), LisaaPelaaja);
+        kentta.SetTileMethod(Color.FromPaintDotNet(0, 10), LisaaVesi);
+        kentta.SetTileMethod(Color.FromPaintDotNet(1, 1), LisaaPiikit);
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
         Level.Background.CreateGradient(Color.White, Color.SkyBlue);
@@ -56,6 +58,7 @@ public class bojoing : PhysicsGame
         PhysicsObject taso = PhysicsObject.CreateStaticObject(leveys, korkeus);
         taso.Position = paikka;
         taso.Color = Color.Green;
+        taso.CollisionIgnoreGroup = 1;
         Add(taso);
     }
 
@@ -66,17 +69,46 @@ public class bojoing : PhysicsGame
         tahti.Position = paikka;
         tahti.Image = tahtiKuva;
         tahti.Tag = "tahti";
+        tahti.CollisionIgnoreGroup = 1;
         Add(tahti);
+    }
+
+    void LisaaVesi(Vector paikka, double leveys, double korkeus)
+    {
+        PhysicsObject vesi = PhysicsObject.CreateStaticObject(leveys, korkeus);
+        vesi.Position = paikka;
+        Color omaVari = Color.FromHexCode( Color.Blue.ToString() );
+        omaVari.AlphaComponent = 124;
+        vesi.Color = omaVari;
+        vesi.IgnoresCollisionResponse = true;
+        vesi.CollisionIgnoreGroup = 1;
+        AddCollisionHandler(vesi, "pelaaja", Kelluu);
+        Add(vesi, 1);
+    }
+    void LisaaPiikit(Vector paikka, double leveys, double korkeus)
+    {
+        PhysicsObject piikki = PhysicsObject.CreateStaticObject(leveys, korkeus);
+        piikki.Position = paikka;
+        piikki.Color = Color.Gray;
+        piikki.Shape = Shape.Triangle;
+        piikki.CollisionIgnoreGroup = 1;
+        Add(piikki);
+
+        AddCollisionHandler(piikki, "pelaaja", kuolee);
+    }
+    void kuolee(PhysicsObject kuka, PhysicsObject kehen) {
+        pelaaja1.Position = pelaajanPaikka;
     }
 
     void LisaaPelaajaKuvasta(Image pelaajanKuva)
     {
         pelaaja1 = new PlatformCharacter(pelaajanLeveys, pelaajanKorkeus);
+        pelaaja1.Tag = "pelaaja";
         pelaaja1.Position = pelaajanPaikka;
         pelaaja1.Mass = 4.0;
         pelaaja1.Image = pelaajanKuva;
-        AddCollisionHandler(pelaaja1, "tahti", TormaaTahteen);
         Add(pelaaja1);
+
 
         Camera.Follow(pelaaja1);
         LisaaNappaimet();
@@ -116,11 +148,10 @@ public class bojoing : PhysicsGame
     {
         hahmo.Jump(nopeus);
     }
-
-    void TormaaTahteen(PhysicsObject hahmo, PhysicsObject tahti)
+    void Kelluu(PhysicsObject kuka, PhysicsObject kehen)
     {
-        maaliAani.Play();
-        MessageDisplay.Add("Keräsit tähden!");
-        tahti.Destroy();
+        pelaaja1.Hit(new Vector(0, 700));
     }
+   
+    
 }

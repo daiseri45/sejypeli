@@ -60,11 +60,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="kentta1.txt">
-      <Name>kentta1</Name>
-      <Importer>TextFileImporter</Importer>
-      <Processor>TextFileContentProcessor</Processor>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ihminen %28peliin%29.png">
@@ -74,6 +69,13 @@
     </Compile>
     <Compile Include="ihminen 2 %28peliin%29.png">
       <Name>ihminen 2 %28peliin%29</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="kentta.png">
+      <Name>kentta</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
