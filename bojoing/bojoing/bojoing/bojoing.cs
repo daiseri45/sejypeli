@@ -12,6 +12,7 @@ public class bojoing : PhysicsGame
     const double hyppyNopeus = 750;
     const int RUUDUN_KOKO = 40;
 
+    Timer aikaLaskuri;
     PlatformCharacter pelaaja1;
 
     Image pelaajanKuva1 = LoadImage("ihminen (peliin)");
@@ -28,6 +29,7 @@ public class bojoing : PhysicsGame
         Gravity = new Vector(0, -1000);
 
         LuoKentta();
+        
         //LisaaNappaimet();
 
         MultiSelectWindow alkuValikko = new MultiSelectWindow("pelaaja valikko",
@@ -38,6 +40,8 @@ public class bojoing : PhysicsGame
 
         Camera.ZoomFactor = 1.2;
         Camera.StayInLevel = true;
+
+        LuoAikaLaskuri();
     }
 
     void LuoKentta()
@@ -48,6 +52,10 @@ public class bojoing : PhysicsGame
         kentta.SetTileMethod(Color.FromPaintDotNet(0, 2), LisaaPelaaja);
         kentta.SetTileMethod(Color.FromPaintDotNet(0, 10), LisaaVesi);
         kentta.SetTileMethod(Color.FromPaintDotNet(1, 1), LisaaPiikit);
+        
+        kentta.Optimize(Color.Black);
+        kentta.Optimize(Color.FromPaintDotNet(0, 10));
+
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
         Level.Background.CreateGradient(Color.White, Color.SkyBlue);
@@ -112,6 +120,7 @@ public class bojoing : PhysicsGame
 
         Camera.Follow(pelaaja1);
         LisaaNappaimet();
+        
     }
 
     void LisaaPelaaja(Vector paikka, double leveys, double korkeus)
@@ -136,7 +145,14 @@ public class bojoing : PhysicsGame
         ControllerOne.Listen(Button.DPadRight, ButtonState.Down, Liikuta, "Pelaaja liikkuu oikealle", pelaaja1, nopeus);
         ControllerOne.Listen(Button.A, ButtonState.Pressed, Hyppaa, "Pelaaja hyppää", pelaaja1, hyppyNopeus);
 
+        Keyboard.Listen(Key.R, ButtonState.Pressed, Cheat, "Huijaa", pelaaja1, new Vector(400,300));
+
         PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
+    }
+
+    void Cheat(PlatformCharacter hahmo, Vector paikka)
+    {
+        hahmo.Position = paikka;
     }
 
     void Liikuta(PlatformCharacter hahmo, double nopeus)
@@ -150,8 +166,44 @@ public class bojoing : PhysicsGame
     }
     void Kelluu(PhysicsObject kuka, PhysicsObject kehen)
     {
-        pelaaja1.Hit(new Vector(0, 700));
+        GameObject teksti = new GameObject(800, 150);
+        teksti.Image = LoadImage("victory");
+        Add(teksti);
+        aikaLaskuri.Stop();
+
+        Timer.SingleShot(0.1, UusiRajahdus);
+
+        Explosion rajahdys = new Explosion(500);
+        rajahdys.Position = RandomGen.NextVector(0, 400);
+        rajahdys.UseShockWave = false;
+        rajahdys.Speed = 50.0;
+        rajahdys.Force = 10000;
+        Add(rajahdys);
     }
-   
-    
+
+    void LuoAikaLaskuri()
+    {
+        aikaLaskuri = new Timer();
+        aikaLaskuri.Start();
+
+        Label aikaNaytto = new Label();
+        aikaNaytto.TextColor = Color.Black;
+        aikaNaytto.DecimalPlaces = 1;
+        aikaNaytto.BindTo(aikaLaskuri.SecondCounter);
+        aikaNaytto.Position = new Vector(Screen.Left + 50, Screen.Top - 50);
+        Add(aikaNaytto);
+    }
+    void UusiRajahdus()
+    {
+        Explosion rajahdys = new Explosion(500);
+        rajahdys.Position = RandomGen.NextVector(0, 400);
+        rajahdys.UseShockWave = false;
+        rajahdys.Speed = 100.0;
+        rajahdys.Force = 10000;
+        //rajahdys.ShockwaveColor = RandomGen.NextColor();
+        rajahdys.ShockwaveColor = new Color(0, 0, 250, 90);
+        Add(rajahdys);
+
+        Timer.SingleShot(1.0, UusiRajahdus);
+    }
 }
