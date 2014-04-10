@@ -18,6 +18,7 @@ public class bojoing : PhysicsGame
     Image pelaajanKuva1 = LoadImage("ihminen (peliin)");
     Image pelaajanKuva2 = LoadImage("ihminen 2 (peliin)");
     Image tahtiKuva = LoadImage("tahti");
+    Image valittuPelaaja;
 
     SoundEffect maaliAani = LoadSoundEffect("maali");
     private Vector pelaajanPaikka;
@@ -31,13 +32,18 @@ public class bojoing : PhysicsGame
         LuoKentta();
         
         //LisaaNappaimet();
-
-        MultiSelectWindow alkuValikko = new MultiSelectWindow("pelaaja valikko",
-        "XD LOL", "sumopainia");
-        Add(alkuValikko);
-        alkuValikko.AddItemHandler(0, LisaaPelaajaKuvasta, pelaajanKuva1);
-        alkuValikko.AddItemHandler(1, LisaaPelaajaKuvasta, pelaajanKuva2);
-
+        if (valittuPelaaja == null)
+        {
+            MultiSelectWindow alkuValikko = new MultiSelectWindow("pelaaja valikko",
+            "XD LOL", "sumopainia");
+            Add(alkuValikko);
+            alkuValikko.AddItemHandler(0, LisaaPelaajaKuvasta, pelaajanKuva1);
+            alkuValikko.AddItemHandler(1, LisaaPelaajaKuvasta, pelaajanKuva2);
+        }
+        else
+        {
+            LisaaPelaajaKuvasta(valittuPelaaja);
+        }
         Camera.ZoomFactor = 1.2;
         Camera.StayInLevel = true;
 
@@ -110,6 +116,7 @@ public class bojoing : PhysicsGame
 
     void LisaaPelaajaKuvasta(Image pelaajanKuva)
     {
+        valittuPelaaja = pelaajanKuva;
         pelaaja1 = new PlatformCharacter(pelaajanLeveys, pelaajanKorkeus);
         pelaaja1.Tag = "pelaaja";
         pelaaja1.Position = pelaajanPaikka;
@@ -173,6 +180,7 @@ public class bojoing : PhysicsGame
 
         Timer.SingleShot(0.1, UusiRajahdus);
 
+        Timer.SingleShot(3.0, AloitaPeli);
         Explosion rajahdys = new Explosion(500);
         rajahdys.Position = RandomGen.NextVector(0, 400);
         rajahdys.UseShockWave = false;
@@ -206,4 +214,10 @@ public class bojoing : PhysicsGame
 
         Timer.SingleShot(1.0, UusiRajahdus);
     }
+    void AloitaPeli()
+    {
+        ClearAll();
+        Begin();
+    }
+
 }
